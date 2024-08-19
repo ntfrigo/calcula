@@ -1,5 +1,7 @@
 <?php
 	include_once("basedados.php");
+	include("telas.php");
+	include("calculos.php");
 
     session_start();
 
@@ -24,7 +26,7 @@
 <head>
     <meta charset="utf-8">
     <title>Calcular investimentos</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" />
     <link href="dashboard.css" rel="stylesheet">
 </head>
@@ -120,176 +122,17 @@
                             </tr>
                         </thead>
                         <tbody>
-
-                            <?php  
-          
-          if($botao_calcular === true) 
-          {
-              $result = mysqli_query($mysqli, "SELECT * FROM invest.modelos where ativo = 'S'");
-    
-              while($user_data = mysqli_fetch_array($result)) 
-              {         
-                $is_prefixado = $user_data['prefixado'] == "S";
-                $is_isento_ir = $user_data['isento_ir'] == "S";
-                
-                $taxa_aplicada = 0;
-                $percent_tot = 10.50;
-                $taxa_aa = number_format((float)$user_data['taxa_aa'], 2);
-                $percent_cdi = number_format((float)$user_data['percent_cdi'], 2);
-
-                if($is_prefixado === true){
-                    $taxa_aplicada = $taxa_aa;
-                }else{
-                    $taxa_aplicada = ($percent_cdi * $percent_tot) / 100;
-                }                
-
-                $prazo_anos = $prazo_meses / 12;
-                $prazo_dias = $prazo_meses * 30;
-                
-                $valor_futuro = $valor_investir * pow((1+($taxa_aplicada/100)),$prazo_anos);
-                $lucro_bruto = $valor_futuro - $valor_investir;
-                $taxa_ir = 22.5;
-                
-                if ($prazo_dias <= 180) {
-                    $taxa_ir = 22.5;
-                } elseif ($prazo_dias <= 360) {
-                    $taxa_ir = 20.0;
-                } elseif ($prazo_dias <= 720) {
-                    $taxa_ir = 17.5;
-                } else {
-                    $taxa_ir = 15.0;
-                }
-                
-                if ($is_isento_ir === true) {
-                    $taxa_ir = 0;
-                }
-
-
-                $valor_ir = $lucro_bruto * ($taxa_ir / 100);
-                $lucro_liquido = $lucro_bruto - $valor_ir;
-                $total_liquido = $valor_investir + $lucro_liquido;
-
-
-                $status_ativo = $user_data['ativo'] === "S" ? "checked":"";
-                $status_isento = $user_data['isento_ir'] === "S" ? "checked":"";
-
-                    
-                echo "<tr>";
-                echo "<td>".$user_data['descricao']."</td>";
-                echo "<td>".($is_prefixado === true ? "" : $user_data['percent_cdi']."%")."</td>";
-                
-                echo "<td>".number_format((float)$taxa_aplicada, 2)."</td>";    
-                echo "<td>".number_format((float)$valor_futuro, 2)."</td>";    
-                echo "<td>".number_format((float)$lucro_bruto, 2)."</td>";    
-                echo "<td>".number_format((float)$valor_ir, 2)."</td>";    
-                echo "<td>".number_format((float)$lucro_liquido, 2)."</td>";    
-                echo "<td>".number_format((float)$total_liquido, 2)."</td>"; 
-                
-
-			  				echo '<td>                
-                <button class="btn btn-primary  btn-sm" data-toggle="modal" data-target="#telaModalEditar'.$user_data['idmodelo'].'">Editar</button>		  			
-                <button class="btn btn-danger  btn-sm" data-toggle="modal" data-target="#telaModalExcluir'.$user_data['idmodelo'].'">Excluir</button>
-                </td>';		
-
-                echo "</tr>";   
-                
-                echo '<!-- Modal Editar -->
-
-								<div class="modal fade" id="telaModalEditar'.$user_data['idmodelo'].'" tabindex="-1" role="dialog" aria-labelledby="telaModalEditarLabel" aria-hidden="true">
-								  <div class="modal-dialog" role="document">
-								    <div class="modal-content">
-								      <div class="modal-header">
-								        <h5 class="modal-title" id="telaModalEditarLabel">Editar</h5>
-								        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-								      </div>
-								      <div class="modal-body">
-									    <form method="post" action="editar.php" class="needs-validation" id="form_editar">
-									      
-                                        <input class="form-control" value="'.$user_data['idmodelo'].'" id="form_edit_idmodelo"  name="form_edit_idmodelo"  type="hidden"> 										    
-                                        <input class="form-control" value="'.$is_prefixado.'"          id="form_edit_prefixado" name="form_edit_prefixado" type="hidden"> 	
-                                                                                
-                                        <div class="input-group input-group-sm mb-3">
-                                            <span class="input-group-text" id="inputGroup-sizing-sm">Descrição</span>
-                                            <input type="text" class="form-control" aria-describedby="inputGroup-sizing-sm" name="form_edit_descricao" value="'.$user_data['descricao'].'" required autofocus>
-                                            <div class="invalid-feedback">Informe a descrição.</div>
-                                        </div>';
-
-                                            if ($is_prefixado === true) 
-                                            {
-                                    echo '<div class="input-group input-group-sm mb-3" id="div_edit_taxa_aa">
-                                    <span class="input-group-text" id="inputGroup-sizing-sm">taxa_aa</span>
-                                    <input type="text" class="form-control" aria-describedby="inputGroup-sizing-sm" name="form_edit_taxa_aa" value='.$taxa_aa.'>
-                                    </div>';
-                                            }
-                                            else{
-                                    echo '<div class="input-group input-group-sm mb-3" id="div_edit_percent_cdi">
-                                    <span class="input-group-text" id="inputGroup-sizing-sm">percent_cdi</span>
-                                    <input type="text" class="form-control" aria-describedby="inputGroup-sizing-sm" name="form_edit_percent_cdi" value='.$percent_cdi.'>
-                                    </div>';
-                                            }
-
-                                    echo '  <div class="input-group input-group-sm mb-3">
-                                                <input class="form-check-input me-2" type="checkbox" name="form_edit_isento_ir" id="form_edit_isento_ir" '.$status_isento.' />
-                                                <label class="form-check-label" for="form_edit_isento_ir">isento ir</label>
-                                            </div>
-
-                                            
-                                            <div class="input-group input-group-sm mb-3">
-                                                <input class="form-check-input me-2" type="checkbox" name="form_edit_ativo" id="form_edit_ativo" '.$status_ativo.' />
-                                                <label class="form-check-label" for="form_edit_ativo">Ativo</label>
-                                            </div>
-
-
-
-
-
-                                            <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancelar</button>
-                                            <button class="btn btn-lg btn-success btn-block btn-sm" type="submit" name="Submit_Editar">Salvar</button>
-                                        </div>
-
-                                        </form>
-								      </div>
-								    </div>
-								  </div>
-								</div>	
-
-								<!-- Modal Editar -->';		  
-
-                echo '<!-- Modal Excluir -->
-
-								<div class="modal fade" id="telaModalExcluir'.$user_data['idmodelo'].'" tabindex="-1" role="dialog" aria-labelledby="telaModalExcluirLabel" aria-hidden="true">
-								  <div class="modal-dialog" role="document">
-								    <div class="modal-content">
-								      <div class="modal-header">
-								        <h5 class="modal-title" id="telaModalExcluirLabel">Excluir</h5>
-								        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-								      </div>
-								      <div class="modal-body">
-									    <form action="Excluir.php" method="post" class="form-signin"  id="form_deletar">									      
-                                        <input class="form-control" value="'.$user_data['idmodelo'].'" id="form_del_idmodelo"  name="form_del_idmodelo"  type="hidden"> 	
-
-								        <h5 class="modal-title" id="telaModalExcluirLabel">Deseja realmente excluir a informação selecionada?</h5>
-
-                                            <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancelar</button>
-                                            <button class="btn btn-lg btn-success btn-block btn-sm" type="submit"  name="Submit_Excluir">Confirmar</button>
-                                        </div>
-
-                                        </form>
-								      </div>
-								    </div>
-								  </div>
-								</div>	
-
-								<!-- Modal Excluir -->';	
-
-
-              }
-              $botao_calcular = false;
-            }
-          ?>
-
+                            <?php            
+                                if($botao_calcular === true) 
+                                {
+                                    $taxa_selic = 10.50;
+                                    while($user_data = mysqli_fetch_array($consulta_modelos_ativos))
+                                    {
+                                        CarregaItensLista($user_data, $valor_investir, $prazo_meses, $taxa_selic);                                        
+                                    }
+                                    $botao_calcular = false;
+                                }
+                            ?>
                         </tbody>
                     </table>
                 </div>
@@ -297,74 +140,14 @@
         </div>
     </div>
 
-
-    <!-- Modal Adicionar -->
-
-    <div class="modal fade" id="telaModalInserir" tabindex="-1" role="dialog" aria-labelledby="telaModalInserirLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="telaModalInserirLabel">Novo</h5>
-                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="post" action="inserir.php" class="needs-validation" id="form_inserir">
-
-                        <div class="input-group input-group-sm mb-3">
-                            <span class="input-group-text" id="inputGroup-sizing-sm">Descrição</span>
-                            <input type="text" class="form-control" aria-describedby="inputGroup-sizing-sm"
-                                name="form_ins_descricao" required autofocus>
-                            <div class="invalid-feedback">Informe a descrição.</div>
-                        </div>
-
-                        <div class="input-group input-group-sm mb-3">
-                            <input class="form-check-input me-2" type="checkbox" id="prefixado_inserir"
-                                name="form_ins_prefixado" />
-                            <label class="form-check-label" for="prefixado_inserir">prefixado</label>
-                        </div>
-
-                        <div class="input-group input-group-sm mb-3" id="divpercent_cdi">
-                            <span class="input-group-text" id="inputGroup-sizing-sm">percent_cdi</span>
-                            <input type="text" class="form-control" aria-describedby="inputGroup-sizing-sm"
-                                name="form_ins_percent_cdi">
-                        </div>
-
-                        <div class="input-group input-group-sm mb-3" id="divtaxa_aa">
-                            <span class="input-group-text" id="inputGroup-sizing-sm">taxa_aa</span>
-                            <input type="text" class="form-control" aria-describedby="inputGroup-sizing-sm"
-                                name="form_ins_taxa_aa">
-                        </div>
-
-                        <div class="input-group input-group-sm mb-3">
-                            <input class="form-check-input me-2" type="checkbox" name="form_ins_isento_ir"
-                                id="isento_ir" />
-                            <label class="form-check-label" for="isento_ir">isento ir</label>
-                        </div>
+    <?php CarregaTelaInserir(); ?>
 
 
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary btn-sm"
-                                data-dismiss="modal">Cancelar</button>
-                            <button class="btn btn-lg btn-success btn-block btn-sm" type="submit"
-                                name="Submit_Inserir">Salvar</button>
-                        </div>
-
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Adicionar -->
-
-
-
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <!--script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script-->
     <script src="http://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
     <script src="http://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="dashboard.js"></script>
 
 
