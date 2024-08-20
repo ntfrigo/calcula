@@ -23,7 +23,7 @@ if(isset($_POST['Submit_Editar']))
             $campoVisivel = "percent_cdi=$percent_cdi";
         }
        
-        $sql = "UPDATE modelos SET descricao='$descricao',$campoVisivel,ativo='$ativo',isento_ir='$isento_ir' WHERE idmodelo=$id";
+        $sql = "UPDATE invest.modelos SET descricao='$descricao',$campoVisivel,ativo='$ativo',isento_ir='$isento_ir' WHERE idmodelo=$id";
         $result = mysqli_query($mysqli, $sql );
 
         $_SESSION["mostraAlerta"] = "success";

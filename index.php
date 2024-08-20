@@ -6,6 +6,7 @@
     session_start();
 
     $botao_calcular = false;
+    $taxa_selic = consulta_taxa_selic($mysqli);
 
 	if(isset($_POST['botao_calcular'])) 
     {
@@ -42,7 +43,7 @@
           <a class="link-light me-3" href="#" data-toggle="modal" data-target="#telaModalInserir">
             <i class="fas fa-plus-circle fa-lg"></i>
           </a>
-          <a class="link-light me-3" href="#">
+          <a class="link-light me-3" href="#" data-toggle="modal" data-target="#telaModalEditarSelic">
           <i class="fas fa-comments-dollar fa-lg"></i>
           </a>
         </div>
@@ -60,9 +61,9 @@
                         <ul class="list-group mb-3">
                             <li class="list-group-item d-flex justify-content-between lh-sm">
                                 <div>
-                                    <h6 class="my-0">Taxa CDI</h6>
+                                    <h6 class="my-0">Taxa Selic</h6>
                                 </div>
-                                <span class="text-muted">10,50</span>
+                                <span class="text-muted"><?php echo $taxa_selic ?> </span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between lh-sm">
                                 <div>
@@ -110,7 +111,7 @@
                     <table class="table table-striped table-sm">
                         <thead>
                             <tr>
-                                <th scope="col">Descricao</th>
+                                <th scope="col">Descricao</th> 
                                 <th scope="col">% CDI</th>
                                 <th scope="col">Taxa a.a.</th>
                                 <th scope="col">Valor bruto</th>
@@ -125,7 +126,6 @@
                             <?php            
                                 if($botao_calcular === true) 
                                 {
-                                    $taxa_selic = 10.50;
                                     while($user_data = mysqli_fetch_array($consulta_modelos_ativos))
                                     {
                                         CarregaItensLista($user_data, $valor_investir, $prazo_meses, $taxa_selic);                                        
@@ -140,7 +140,11 @@
         </div>
     </div>
 
-    <?php CarregaTelaInserir(); ?>
+    <?php 
+    CarregaTelaInserir(); 
+    
+    CarregaTelaEditarSelic($taxa_selic);
+    ?>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

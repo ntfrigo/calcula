@@ -7,7 +7,7 @@ if(isset($_POST['Submit_Excluir']))
     try {
         $id = $_POST['form_del_idmodelo'];
 
-        $sql = "DELETE FROM modelos WHERE idmodelo=$id";
+        $sql = "DELETE FROM invest.modelos WHERE idmodelo=$id";
         $result = mysqli_query($mysqli, $sql );
 
         $_SESSION["mostraAlerta"] = "success";

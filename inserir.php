@@ -24,7 +24,7 @@ if(isset($_POST['Submit_Inserir']))
 
         $isento_ir = isset($_POST['form_ins_isento_ir']) ? "S" : "N";
         
-        $sql = "INSERT INTO modelos (descricao, percent_cdi, taxa_aa, prefixado, ativo, isento_ir) VALUES ('$descricao', $percent_cdi, $taxa_aa, '$prefixado', 'S', '$isento_ir')";
+        $sql = "INSERT INTO invest.modelos (descricao, percent_cdi, taxa_aa, prefixado, ativo, isento_ir) VALUES ('$descricao', $percent_cdi, $taxa_aa, '$prefixado', 'S', '$isento_ir')";
         $result = mysqli_query($mysqli, $sql );
 
         $_SESSION["mostraAlerta"] = "success";

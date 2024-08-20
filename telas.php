@@ -24,17 +24,17 @@ function CarregaTelaInserir() {
                         <div class="input-group input-group-sm mb-3">
                             <input class="form-check-input me-2" type="checkbox" id="prefixado_inserir"
                                 name="form_ins_prefixado" />
-                            <label class="form-check-label" for="prefixado_inserir">prefixado</label>
+                            <label class="form-check-label" for="prefixado_inserir">Taxa prefixada</label>
                         </div>
 
                         <div class="input-group input-group-sm mb-3" id="divpercent_cdi">
-                            <span class="input-group-text" id="inputGroup-sizing-sm">percent_cdi</span>
+                            <span class="input-group-text" id="inputGroup-sizing-sm">% do CDI</span>
                             <input type="text" class="form-control" aria-describedby="inputGroup-sizing-sm"
                                 name="form_ins_percent_cdi">
                         </div>
 
                         <div class="input-group input-group-sm mb-3" id="divtaxa_aa">
-                            <span class="input-group-text" id="inputGroup-sizing-sm">taxa_aa</span>
+                            <span class="input-group-text" id="inputGroup-sizing-sm">Taxa a.a.</span>
                             <input type="text" class="form-control" aria-describedby="inputGroup-sizing-sm"
                                 name="form_ins_taxa_aa">
                         </div>
@@ -42,7 +42,7 @@ function CarregaTelaInserir() {
                         <div class="input-group input-group-sm mb-3">
                             <input class="form-check-input me-2" type="checkbox" name="form_ins_isento_ir"
                                 id="isento_ir" />
-                            <label class="form-check-label" for="isento_ir">isento ir</label>
+                            <label class="form-check-label" for="isento_ir">Isento IR</label>
                         </div>
 
 
@@ -88,20 +88,20 @@ function CarregaTelaEditar($idmodelo, $is_prefixado, $status_ativo, $status_isen
                 if ($is_prefixado === true) 
                 {
         echo '<div class="input-group input-group-sm mb-3" id="div_edit_taxa_aa">
-        <span class="input-group-text" id="inputGroup-sizing-sm">taxa_aa</span>
+        <span class="input-group-text" id="inputGroup-sizing-sm">Taxa a.a.</span>
         <input type="text" class="form-control" aria-describedby="inputGroup-sizing-sm" name="form_edit_taxa_aa" value='.$user_data['taxa_aa'].'>
         </div>';
                 }
                 else{
         echo '<div class="input-group input-group-sm mb-3" id="div_edit_percent_cdi">
-        <span class="input-group-text" id="inputGroup-sizing-sm">percent_cdi</span>
+        <span class="input-group-text" id="inputGroup-sizing-sm">% CDI</span>
         <input type="text" class="form-control" aria-describedby="inputGroup-sizing-sm" name="form_edit_percent_cdi" value='.$user_data['percent_cdi'].'>
         </div>';
                 }
 
         echo '  <div class="input-group input-group-sm mb-3">
                     <input class="form-check-input me-2" type="checkbox" name="form_edit_isento_ir" id="form_edit_isento_ir" '.$status_isento.' />
-                    <label class="form-check-label" for="form_edit_isento_ir">isento ir</label>
+                    <label class="form-check-label" for="form_edit_isento_ir">Isento IR</label>
                 </div>
 
                 
@@ -124,7 +124,7 @@ function CarregaTelaEditar($idmodelo, $is_prefixado, $status_ativo, $status_isen
     <!-- Modal Editar -->';	
 }
 
-function CarregaTelaExcluir($idmodelo) {
+function CarregaTelaExcluir($idmodelo, $descricao) {
 
     echo '<!-- Modal Excluir -->
 
@@ -137,15 +137,16 @@ function CarregaTelaExcluir($idmodelo) {
           </div>
           <div class="modal-body">
             <form action="Excluir.php" method="post" class="form-signin"  id="form_deletar">									      
-            <input class="form-control" value="'.$idmodelo.'" id="form_del_idmodelo"  name="form_del_idmodelo"  type="hidden"> 	
+                <input class="form-control" value="'.$idmodelo.'" id="form_del_idmodelo"  name="form_del_idmodelo"  type="hidden"> 	
 
-            <h5 class="modal-title" id="telaModalExcluirLabel">Deseja realmente excluir a informação selecionada?</h5>
+                <h6 class="my-0 text-danger">Deseja realmente excluir a informação a seguir:</h6>
+                <br>
+                <h6 class="my-0">'.$descricao.', <br><br> Confirma?  <br> &nbsp;  </h6>
 
                 <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancelar</button>
-                <button class="btn btn-lg btn-success btn-block btn-sm" type="submit"  name="Submit_Excluir">Confirmar</button>
-            </div>
-
+                   <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancelar</button>
+                   <button class="btn btn-lg btn-success btn-block btn-sm" type="submit"  name="Submit_Excluir">Confirmar</button>
+                </div>
             </form>
           </div>
         </div>
@@ -194,8 +195,43 @@ function CarregaItensLista($user_data, $valor_investir, $prazo_meses, $taxa_seli
     
     CarregaTelaEditar($idmodelo, $is_prefixado, $status_ativo, $status_isento, $user_data);
 
-    CarregaTelaExcluir($idmodelo);	
+    CarregaTelaExcluir($idmodelo, $user_data['descricao']);	
 
 }
+
+function CarregaTelaEditarSelic($taxa_selic) {
+
+    echo '<!-- Modal Editar Selic -->
+
+    <div class="modal fade" id="telaModalEditarSelic" tabindex="-1" role="dialog" aria-labelledby="telaModalEditarSelicLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="telaModalEditarSelicLabel">Atualizar Taxa Selic</h5>
+            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form method="post" action="atualizar.php" class="needs-validation" id="form_taxa_AtualizaSelic">
+              
+				<div class="input-group input-group-sm mb-3" id="div_edit_taxa_selic">
+				<span class="input-group-text" id="inputGroup-sizing-sm">Taxa Selic</span>
+				<input type="text" class="form-control" aria-describedby="inputGroup-sizing-sm" name="form_edit_taxa_selic" value="'.$taxa_selic.'">
+				</div>
+				
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancelar</button>
+                <button class="btn btn-lg btn-success btn-block btn-sm" type="submit" name="Submit_AtualizaSelic">Salvar</button>
+            </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>	
+
+    <!-- Modal Editar Selic -->';	
+}
+
+
 
 ?>
